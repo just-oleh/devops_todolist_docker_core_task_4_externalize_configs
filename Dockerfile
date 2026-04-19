@@ -20,5 +20,5 @@ RUN pip install --upgrade pip && \
 
 EXPOSE 8080
 
-# Run database migrations and start the Django application
-ENTRYPOINT ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]
+# Wait for MySQL to be ready, then migrate and start
+ENTRYPOINT ["sh", "-c", "until python -c \"import mysql.connector; mysql.connector.connect(host='$HOST', port=$PORT, user='$USER', password='$PASSWORD')\" 2>/dev/null; do echo 'Waiting for MySQL...'; sleep 2; done && python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]
